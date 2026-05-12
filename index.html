@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🕹️ RETRO ARCADE 80's</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a0033 0%, #0d001f 50%, #1a0033 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00, 0 0 20px #ff00ff;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
+            letter-spacing: 3px;
+            animation: neon-flicker 3s infinite;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            animation: neon-flicker 4s infinite 0.5s;
+        }
+
+        @keyframes neon-flicker {
+            0%, 100% {
+                text-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
+                color: #00ff00;
+            }
+            50% {
+                text-shadow: 0 0 30px #ff00ff, 0 0 60px #00ffff;
+                color: #00ffff;
+            }
+        }
+
+        .game-board {
+            background: #000814;
+            border: 4px solid #00ff00;
+            box-shadow: 0 0 20px #00ff00, inset 0 0 20px #00ff00;
+            position: relative;
+            overflow: hidden;
+            margin: 20px auto;
+            background-image: 
+                linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, 0.05) 25%, rgba(0, 255, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.05) 75%, rgba(0, 255, 0, 0.05) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+        }
+
+        canvas {
+            display: block;
+            background: #000;
+        }
+
+        .info-panel {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(90deg, #1a0033, #0d001f);
+            border: 3px solid #00ffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #00ffff;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .score-display, .level-display, .lives-display {
+            font-size: 1.3em;
+            color: #ffff00;
+            text-shadow: 0 0 10px #ffff00;
+            font-weight: bold;
+        }
+
+        .controls {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px dashed #00ff00;
+            border-radius: 8px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .controls h3 {
+            color: #ffffff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .controls p {
+            color: #00ffff;
+            font-size: 0.95em;
+            margin: 5px 0;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #ff00ff, #00ffff);
+            color: #000;
+            border: 3px solid #ffff00;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff;
+        }
+
+        button:hover {
+            box-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .game-over-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a0033, #0d001f);
+            border: 4px solid #ff00ff;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 40px #ff00ff, 0 0 60px #00ffff;
+            animation: modal-pop 0.5s ease-out;
+        }
+
+        @keyframes modal-pop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            color: #ff00ff;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #ff00ff;
+        }
+
+        .modal-content p {
+            color: #00ffff;
+            font-size: 1.3em;
+            margin: 10px 0;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        .modal-content button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ RETRO ARCADE ⚡</h1>
+        <p class="subtitle">[ NEON DODGE GAME ]</p>
+        
+        <div class="game-board">
+            <canvas id="gameCanvas" width="600" height="400"></canvas>
+        </div>
+
+        <div class="info-panel">
+            <div class="score-display">SCORE: <span id="score">0</span></div>
+            <div class="level-display">LEVEL: <span id="level">1</span></div>
+            <div class="lives-display">LIVES: <span id="lives">3</span></div>
+        </div>
+
+        <div class="controls">
+            <h3>🎮 CONTROLES</h3>
+            <p>⬅️ ➡️ Use as SETAS do teclado ou MOUSE para mover</p>
+            <p>🔴 Desvie dos inimigos e colete os cristais azuis!</p>
+            <p>⭐ Cada cristal = 10 pontos | A cada 100 pontos = novo nível</p>
+        </div>
+
+        <button onclick="restartGame()">▶️ INICIAR JOGO</button>
+    </div>
+
+    <div class="game-over-modal" id="gameOverModal">
+        <div class="modal-content">
+            <h2>GAME OVER!</h2>
+            <p>SCORE FINAL: <span id="finalScore">0</span></p>
+            <p>NÍVEL ALCANÇADO: <span id="finalLevel">1</span></p>
+            <button onclick="restartGame()">JOGAR NOVAMENTE</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game variables
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let gameRunning = false;
+
+        // Player
+        const player = {
+            x: canvas.width / 2,
+            y: canvas.height - 40,
+            width: 30,
+            height: 30,
+            speed: 6,
+            color: '#00ff00'
+        };
+
+        // Arrays para enemigos e cristais
+        let enemies = [];
+        let crystals = [];
+
+        // Variáveis para movimento
+        const keys = {};
+        let mouseX = canvas.width / 2;
+
+        // Event listeners
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+        });
+
+        // Funções auxiliares
+        function drawRect(x, y, width, height, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, width, height);
+        }
+
+        function drawCircle(x, y, radius, color) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawPlayer() {
+            // Corpo do player (quadrado verde neon)
+            drawRect(player.x - player.width / 2, player.y - player.height / 2, player.width, player.height, player.color);
+            
+            // Glow effect
+            ctx.strokeStyle = player.color;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(player.x - player.width / 2 - 3, player.y - player.height / 2 - 3, player.width + 6, player.height + 6);
+            
+            // Olhos
+            ctx.fillStyle = '#000';
+            drawCircle(player.x - 7, player.y - 5, 3, '#000');
+            drawCircle(player.x + 7, player.y - 5, 3, '#000');
+        }
+
+        function drawEnemy(enemy) {
+            // Corpo do inimigo (vermelho/magenta)
+            drawRect(enemy.x - enemy.width / 2, enemy.y - enemy.height / 2, enemy.width, enemy.height, enemy.color);
+            
+            // Glow effect
+            ctx.strokeStyle = enemy.color;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(enemy.x - enemy.width / 2 - 3, enemy.y - enemy.height / 2 - 3, enemy.width + 6, enemy.height + 6);
+        }
+
+        function drawCrystal(crystal) {
+            ctx.fillStyle = crystal.color;
+            ctx.beginPath();
+            ctx.moveTo(crystal.x, crystal.y - 12);
+            ctx.lineTo(crystal.x + 8, crystal.y - 4);
+            ctx.lineTo(crystal.x + 8, crystal.y + 4);
+            ctx.lineTo(crystal.x, crystal.y + 12);
+            ctx.lineTo(crystal.x - 8, crystal.y + 4);
+            ctx.lineTo(crystal.x - 8, crystal.y - 4);
+            ctx.closePath();
+            ctx.fill();
+
+            // Glow
+            ctx.strokeStyle = crystal.color;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        function updatePlayer() {
+            // Movimento com teclado
+            if (keys['ArrowLeft'] || keys['a']) {
+                player.x -= player.speed;
+            }
+            if (keys['ArrowRight'] || keys['d']) {
+                player.x += player.speed;
+            }
+
+            // Movimento com mouse
+            if (Math.abs(mouseX - player.x) > 5) {
+                player.x += (mouseX - player.x) * 0.1;
+            }
+
+            // Limites da tela
+            if (player.x - player.width / 2 < 0) player.x = player.width / 2;
+            if (player.x + player.width / 2 > canvas.width) player.x = canvas.width - player.width / 2;
+        }
+
+        function spawnEnemy() {
+            const enemy = {
+                x: Math.random() * (canvas.width - 60) + 30,
+                y: -20,
+                width: 30,
+                height: 30,
+                speed: 2 + level * 0.5,
+                color: '#ff0055'
+            };
+            enemies.push(enemy);
+        }
+
+        function spawnCrystal() {
+            const crystal = {
+                x: Math.random() * (canvas.width - 40) + 20,
+                y: -20,
+                width: 20,
+                height: 20,
+                speed: 2,
+                color: '#00ffff'
+            };
+            crystals.push(crystal);
+        }
+
+        function updateEnemies() {
+            enemies.forEach((enemy, index) => {
+                enemy.y += enemy.speed;
+                if (enemy.y > canvas.height) {
+                    enemies.splice(index, 1);
+                }
+            });
+        }
+
+        function updateCrystals() {
+            crystals.forEach((crystal, index) => {
+                crystal.y += crystal.speed;
+                if (crystal.y > canvas.height) {
+                    crystals.splice(index, 1);
+                }
+            });
+        }
+
+        function checkCollisions() {
+            // Colisão com inimigos
+            enemies.forEach((enemy, eIndex) => {
+                if (checkRectCollision(player, enemy)) {
+                    lives--;
+                    enemies.splice(eIndex, 1);
+                    document.getElementById('lives').textContent = lives;
+
+                    if (lives <= 0) {
+                        endGame();
+                    }
+                }
+            });
+
+            // Colisão com cristais
+            crystals.forEach((crystal, cIndex) => {
+                if (checkRectCollision(player, crystal)) {
+                    score += 10;
+                    crystals.splice(cIndex, 1);
+                    document.getElementById('score').textContent = score;
+
+                    // Aumentar nível a cada 100 pontos
+                    const newLevel = Math.floor(score / 100) + 1;
+                    if (newLevel > level) {
+                        level = newLevel;
+                        document.getElementById('level').textContent = level;
+                    }
+                }
+            });
+        }
+
+        function checkRectCollision(rect1, rect2) {
+            return rect1.x - rect1.width / 2 < rect2.x + rect2.width / 2 &&
+                   rect1.x + rect1.width / 2 > rect2.x - rect2.width / 2 &&
+                   rect1.y - rect1.height / 2 < rect2.y + rect2.height / 2 &&
+                   rect1.y + rect1.height / 2 > rect2.y - rect2.height / 2;
+        }
+
+        let spawnCounter = 0;
+        let spawnRate = 80 - level * 5;
+
+        function gameLoop() {
+            // Limpar canvas com efeito de scanlines
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Desenhar scanlines
+            ctx.strokeStyle = 'rgba(0, 255, 0, 0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.height; i += 2) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+
+            if (gameRunning) {
+                updatePlayer();
+                updateEnemies();
+                updateCrystals();
+                checkCollisions();
+
+                // Spawn de inimigos
+                spawnCounter++;
+                if (spawnCounter > spawnRate) {
+                    spawnEnemy();
+                    spawnCounter = 0;
+                    spawnRate = Math.max(30, 80 - level * 5);
+                }
+
+                // Spawn de cristais
+                if (Math.random() < 0.01 + level * 0.005) {
+                    spawnCrystal();
+                }
+
+                // Desenhar tudo
+                enemies.forEach(drawEnemy);
+                crystals.forEach(drawCrystal);
+                drawPlayer();
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function endGame() {
+            gameRunning = false;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalLevel').textContent = level;
+            document.getElementById('gameOverModal').style.display = 'flex';
+        }
+
+        function restartGame() {
+            score = 0;
+            level = 1;
+            lives = 3;
+            gameRunning = true;
+            enemies = [];
+            crystals = [];
+            player.x = canvas.width / 2;
+            spawnCounter = 0;
+
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('gameOverModal').style.display = 'none';
+        }
+
+        // Iniciar o jogo
+        gameLoop();
+    </script>
+</body>
+</html>
