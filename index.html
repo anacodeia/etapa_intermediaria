@@ -224,6 +224,7 @@
             <h2>GAME OVER!</h2>
             <p>SCORE FINAL: <span id="finalScore">0</span></p>
             <p>NÍVEL ALCANÇADO: <span id="finalLevel">1</span></p>
+            <p id="adviceText">Carregando dica...</p>
             <button onclick="restartGame()">JOGAR NOVAMENTE</button>
         </div>
     </div>
@@ -470,9 +471,29 @@
 
             requestAnimationFrame(gameLoop);
         }
+        async function fetchAdvice() {
 
+    try {
+
+        const response = await fetch(
+            "https://api.adviceslip.com/advice"
+        );
+
+        const data = await response.json();
+
+        document.getElementById("adviceText").textContent =
+            "DICA RETRÔ: " + data.slip.advice;
+
+    } catch (error) {
+
+        document.getElementById("adviceText").textContent =
+            "Erro ao carregar dica.";
+
+    }
+}
         function endGame() {
             gameRunning = false;
+            fetchAdvice();
             document.getElementById('finalScore').textContent = score;
             document.getElementById('finalLevel').textContent = level;
             document.getElementById('gameOverModal').style.display = 'flex';
